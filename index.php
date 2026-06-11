@@ -1,3 +1,49 @@
+<?php
+// ── Handle Notify Me Form Submission ──────────────────────────
+$notify_message = '';
+$notify_type    = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+
+    if (empty($email)) {
+        $notify_message = 'Please enter your email address.';
+        $notify_type    = 'error';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $notify_message = 'Please enter a valid email address.';
+        $notify_type    = 'error';
+    } else {
+        $email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
+        $file  = __DIR__ . '/subscribers.txt';
+
+        // Check for duplicate
+        $already_subscribed = false;
+        if (file_exists($file)) {
+            $existing = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            $already_subscribed = in_array($email, array_map('trim', $existing));
+        }
+
+        if ($already_subscribed) {
+            $notify_message = 'You are already subscribed!';
+            $notify_type    = 'info';
+        } else {
+            $saved = file_put_contents(
+                $file,
+                $email . PHP_EOL,
+                FILE_APPEND | LOCK_EX
+            );
+
+            if ($saved !== false) {
+                $notify_message = '&#10003; Thank you! We\'ll notify you when we launch.';
+                $notify_type    = 'success';
+            } else {
+                $notify_message = 'Something went wrong. Please try again later.';
+                $notify_type    = 'error';
+            }
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -225,12 +271,14 @@
             transform: scale(0.98);
         }
 
-        .success-msg {
-            display: none;
+        .notify-msg {
+            display: block;
             margin-top: 14px;
             font-size: 14px;
-            color: #a8f0c6;
         }
+        .notify-msg.success { color: #a8f0c6; }
+        .notify-msg.error   { color: #ffaaaa; }
+        .notify-msg.info    { color: #ffe08a; }
 
         /* Features teaser */
         .features {
@@ -347,11 +395,15 @@
     <!-- Notify Me Form -->
     <div class="notify-section">
         <p class="notify-label">Be the First to Know</p>
-        <form class="notify-form" onsubmit="handleNotify(event)">
-            <input type="email" id="email-input" placeholder="Enter your email address" required>
+        <form class="notify-form" method="POST" action="">
+            <input type="email" name="email" id="email-input" placeholder="Enter your email address" required>
             <button type="submit">Notify Me</button>
         </form>
-        <p class="success-msg" id="success-msg">&#10003; Thank you! We'll notify you when we launch.</p>
+        <?php if (!empty($notify_message)): ?>
+        <p class="notify-msg <?php echo htmlspecialchars($notify_type, ENT_QUOTES, 'UTF-8'); ?>">
+            <?php echo $notify_message; ?>
+        </p>
+        <?php endif; ?>
     </div>
 
     <!-- Feature Teasers -->
@@ -423,18 +475,7 @@
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // ── Notify Me Form ────────────────────────────────────────────
-    function handleNotify(e) {
-        e.preventDefault();
-        const email = document.getElementById('email-input').value.trim();
-        if (!email) return;
-
-        // TODO: wire up to your backend / mailing list API
-        document.getElementById('email-input').value = '';
-        const msg = document.getElementById('success-msg');
-        msg.style.display = 'block';
-        setTimeout(() => { msg.style.display = 'none'; }, 5000);
-    }
+    // Form is handled server-side via PHP POST
 </script>
 
 </body>
