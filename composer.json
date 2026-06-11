@@ -3,7 +3,7 @@
     "description": "staylivenhealthy PHP application for App Platform",
     "type": "project",
     "require": {
-        "php": "^7.4",
+        "php": "^8.4",
         "alrik11es/cowsayphp": "^1.2"
     },
     "authors": [
