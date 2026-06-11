@@ -1,15 +1,15 @@
 {
-    "name": "digitalocean-apps/sample-php",
-    "description": "Sample PHP application for App Platform",
+    "name": "staylivenhealthy/staylivewebfile",
+    "description": "staylivenhealthy PHP application for App Platform",
     "type": "project",
     "require": {
-        "php": "^8.4",
+        "php": "^7.4",
         "alrik11es/cowsayphp": "^1.2"
     },
     "authors": [
         {
-            "name": "Kamal Nasser",
-            "email": "kamal@digitalocean.com"
+            "name": "subhajit mondal",
+            "email": "subhajit@digitalocean.com"
         }
     ]
 }
