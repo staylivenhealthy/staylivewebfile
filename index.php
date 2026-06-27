@@ -36,7 +36,7 @@
     />
 
     <meta name="format-detection" content="telephone=no" />
-    <title>Older Australians | Department of Social Services ckk</title>
+    <title>Older Australians | Department of Social Services</title>
     <style media="all">
       /* @license GPL-2.0-or-later https://www.drupal.org/licensing/faq */
       .text-align-left {
